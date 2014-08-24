@@ -1,0 +1,7 @@
+box: wercker/python
+build:
+  steps:
+    - pip-install
+      packages_list: "pytest"
+    - name: run tests
+      code: py.test tests.py
