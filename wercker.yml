@@ -5,7 +5,7 @@ build:
         packages_list: "pytest"
     - script:
         name: run tests
-        code: py.test tests.py
+        code: py.test tests/tests.py
 deploy:
   steps:
     - heroku-deploy:
