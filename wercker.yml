@@ -6,3 +6,7 @@ build:
     - script:
         name: run tests
         code: py.test tests.py
+deploy:
+  steps:
+    - heroku-deploy:
+        key-name: HEROKU_DEPLOY_KEY
