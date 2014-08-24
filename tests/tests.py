@@ -74,5 +74,5 @@ class TestApp(object):
 
         args, kwargs = image.save.call_args
 
-        assert kwargs['quality'] <= 30
-        assert kwargs['quality'] >= 10
+        assert kwargs['quality'] <= 5
+        assert kwargs['quality'] >= 3

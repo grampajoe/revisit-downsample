@@ -24,9 +24,9 @@ def service():
     source = StringIO(base64.b64decode(image_data))
     image = Image.open(source)
 
-    # Save the image at between 10 and 30 quality.
+    # Save the image at between 3 and 5 quality.
     dest = StringIO()
-    image.save(dest, format='jpeg', quality=random.randrange(10, 30))
+    image.save(dest, format='jpeg', quality=random.randrange(3, 6))
 
     # Base64 encode the image.
     dest.seek(0)
