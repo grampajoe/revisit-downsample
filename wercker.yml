@@ -2,7 +2,7 @@ box: wercker/python
 build:
   steps:
     - pip-install:
-      packages_list: "pytest"
+        packages_list: "pytest"
     - script:
-      name: run tests
-      code: py.test tests.py
+        name: run tests
+        code: py.test tests.py
