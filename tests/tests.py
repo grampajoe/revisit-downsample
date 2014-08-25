@@ -70,9 +70,20 @@ class TestApp(object):
     def test_saves_low_quality(self, image_class):
         """The image should be saved at a low quality."""
         image = image_class.open.return_value
+        image.convert.return_value = image
+
         self._post_image()
 
         args, kwargs = image.save.call_args
 
         assert kwargs['quality'] <= 5
         assert kwargs['quality'] >= 3
+
+    @patch('downsample.Image')
+    def test_converts_to_rgb(self, image_class):
+        """Should convert all images into RGB."""
+        image = image_class.open.return_value
+        
+        self._post_image()
+
+        image.convert.assert_called_with('RGB')
