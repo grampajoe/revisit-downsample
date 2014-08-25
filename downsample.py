@@ -3,6 +3,7 @@ import random
 from flask import Flask, jsonify, request
 from PIL import Image
 from StringIO import StringIO
+from werkzeug.exceptions import BadRequest
 
 
 app = Flask('downsample')
@@ -14,11 +15,35 @@ def index():
     return 'Wow!!!!!'
 
 
-def _get_image(data):
+def _validate(data):
+    """Validates that the provided JSON is okey-dokey."""
+    if not 'content' in data:
+        raise BadRequest('Invalid JSON: No content attribute found.')
+    elif not 'data' in data['content']:
+        raise BadRequest('Invalid JSON: No image data found.')
+    elif not isinstance(data['content']['data'], basestring):
+        raise BadRequest('Image data must be a string.')
+
+
+def _get_image(data_url):
     """Get the image data from the data URL."""
-    header, image_data = data['content']['data'].split(',')
-    source = StringIO(base64.b64decode(image_data))
-    image = Image.open(source)
+    if not data_url.startswith('data') or not ',' in data_url:
+        raise BadRequest('No data URL found.')
+
+    header, image_data = data_url.split(',')
+
+    try:
+        decoded_data = base64.b64decode(image_data)
+    except TypeError:
+        raise BadRequest('Image data was not base64.')
+
+    source = StringIO(decoded_data)
+
+    try:
+        image = Image.open(source)
+    except IOError:
+        raise BadRequest('Invalid image data.')
+
     return image.convert('RGB')
 
 
@@ -39,8 +64,9 @@ def _downsample_image(image):
 def service():
     """Returns a low quality version of an incoming image."""
     data = request.json
+    _validate(data)
 
-    image = _get_image(data)
+    image = _get_image(data['content']['data'])
 
     crappy_jpeg = _downsample_image(image)
 

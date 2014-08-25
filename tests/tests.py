@@ -87,3 +87,67 @@ class TestApp(object):
         self._post_image()
 
         image.convert.assert_called_with('RGB')
+
+
+class TestValidation(object):
+    """Validation tests!"""
+    def setup_method(self, method):
+        self.client = app.test_client()
+
+    def test_validates_json_data(self):
+        """Should validate the data value."""
+        payload = json.dumps({
+            'content': {
+                'data': {'what': 'why'},
+            },
+        })
+
+        response = self.client.post(
+            '/service',
+            data=payload,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 400
+
+    def test_validate_valid_image(self):
+        """Should validate that an image was actually passed in."""
+        payload = json.dumps({
+            'content': {'data': 'data:image/jpeg;base64,butt'},
+        })
+
+        response = self.client.post(
+            '/service',
+            data=payload,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 400
+
+    def test_validate_valid_base64(self):
+        """Should validate base64-ness of the image URL."""
+        payload = json.dumps({
+            'content': {'data': 'data:image/gif;base64,garbl!!!'},  # Won't be decoded
+        })
+
+        response = self.client.post(
+            '/service',
+            data=payload,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 400
+
+    def test_validate_data_url(self):
+        """Should validate the data URL."""
+        payload = json.dumps({
+            'content': {'data': 'whoops'},
+        })
+
+        response = self.client.post(
+            '/service',
+            data=payload,
+            content_type='application/json',
+        )
+
+        assert response.status_code == 400
